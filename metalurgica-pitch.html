@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MetalGest — Sistema de Gestão para Metalúrgicas</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d0f12;
+  --surface: #141820;
+  --surface2: #1a2030;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --orange: #f5740a;
+  --orange2: #ff9240;
+  --yellow: #f5c842;
+  --red: #e84040;
+  --green: #2ecc71;
+  --blue: #3a9bdc;
+  --white: #eef2f7;
+  --muted: #6b7a94;
+  --muted2: #9aaabf;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ───── NOISE TEXTURE OVERLAY ───── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+section, .hero, .problems, .solution, .modules, .flow-section, .cta-section { position: relative; z-index: 1; }
+
+/* ───── HERO ───── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 48px 60px;
+  background:
+    radial-gradient(ellipse 80% 60% at 60% 30%, rgba(245,116,10,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 10% 80%, rgba(58,155,220,0.07) 0%, transparent 60%);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: 'METALGEST';
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 200px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.015);
+  letter-spacing: -8px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245,116,10,0.12);
+  border: 1px solid rgba(245,116,10,0.35);
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--orange2);
+  margin-bottom: 32px;
+  width: fit-content;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-tag::before { content: '▶'; font-size: 9px; }
+
+.hero-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(52px, 7vw, 96px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  max-width: 820px;
+  animation: fadeUp 0.6s ease 0.1s both;
+}
+.hero-title em {
+  color: var(--orange);
+  font-style: normal;
+  position: relative;
+}
+.hero-title em::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 0; right: 0;
+  height: 3px;
+  background: var(--orange);
+  opacity: 0.4;
+}
+
+.hero-sub {
+  margin-top: 28px;
+  font-size: 18px;
+  color: var(--muted2);
+  font-weight: 400;
+  max-width: 560px;
+  line-height: 1.65;
+  animation: fadeUp 0.6s ease 0.2s both;
+}
+.hero-sub strong { color: var(--white); font-weight: 600; }
+
+.hero-stats {
+  display: flex;
+  gap: 48px;
+  margin-top: 52px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.6s ease 0.3s both;
+}
+.stat-item { display: flex; flex-direction: column; gap: 4px; }
+.stat-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--orange);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+.stat-div { width: 1px; background: var(--border2); align-self: stretch; }
+
+/* ───── SECTION COMMONS ───── */
+.section-wrap { padding: 80px 48px; }
+
+.section-eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-eyebrow::before { content: ''; width: 24px; height: 2px; background: var(--orange); }
+
+.section-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  line-height: 1.05;
+  margin-bottom: 16px;
+}
+.section-desc {
+  font-size: 16px;
+  color: var(--muted2);
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 48px;
+}
+
+/* ───── PROBLEMS ───── */
+.problems {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.problems-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.problem-card {
+  background: var(--surface);
+  padding: 32px 28px;
+  transition: background 0.2s;
+  animation: fadeUp 0.5s ease both;
+}
+.problem-card:hover { background: var(--surface2); }
+
+.problem-icon {
+  font-size: 28px;
+  margin-bottom: 16px;
+  display: block;
+}
+.problem-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--white);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.problem-desc {
+  font-size: 13.5px;
+  color: var(--muted2);
+  line-height: 1.65;
+}
+.problem-signal {
+  display: inline-block;
+  margin-top: 14px;
+  background: rgba(232,64,64,0.1);
+  border: 1px solid rgba(232,64,64,0.25);
+  color: #ff7070;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* ───── SOLUTION FLOW ───── */
+.solution { background: var(--bg); }
+
+.flow-track {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.flow-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  position: relative;
+  animation: fadeLeft 0.5s ease both;
+}
+.flow-row:nth-child(1) { animation-delay: 0.05s; }
+.flow-row:nth-child(2) { animation-delay: 0.12s; }
+.flow-row:nth-child(3) { animation-delay: 0.18s; }
+.flow-row:nth-child(4) { animation-delay: 0.24s; }
+.flow-row:nth-child(5) { animation-delay: 0.30s; }
+.flow-row:nth-child(6) { animation-delay: 0.36s; }
+.flow-row:nth-child(7) { animation-delay: 0.42s; }
+
+@keyframes fadeLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.flow-num {
+  width: 64px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.flow-num-inner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--bg);
+  flex-shrink: 0;
+  margin-top: 20px;
+  z-index: 1;
+}
+.flow-num-line {
+  width: 2px;
+  flex: 1;
+  background: var(--border2);
+  margin: 4px 0;
+}
+.flow-row:last-child .flow-num-line { display: none; }
+
+.flow-content {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 8px 0;
+  margin-left: 8px;
+  transition: border-color 0.2s;
+}
+.flow-content:hover { border-color: var(--border2); }
+
+.flow-stage-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 6px;
+}
+.flow-stage-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 10px;
+  color: var(--white);
+}
+.flow-stage-desc {
+  font-size: 14px;
+  color: var(--muted2);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.flow-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.flow-feat {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--muted2);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.flow-feat::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 11px; }
+
+/* ───── MODULES ───── */
+.modules { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.mod-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 26px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+  animation: fadeUp 0.5s ease both;
+}
+.mod-card:hover { transform: translateY(-4px); border-color: var(--border2); }
+
+.mod-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+.mod-orange::after  { background: var(--orange); }
+.mod-yellow::after  { background: var(--yellow); }
+.mod-blue::after    { background: var(--blue); }
+.mod-green::after   { background: var(--green); }
+.mod-red::after     { background: var(--red); }
+.mod-purple::after  { background: #a78bfa; }
+.mod-teal::after    { background: #2dd4bf; }
+
+.mod-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.mod-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+.mod-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.04);
+  line-height: 1;
+}
+
+.mod-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+.mod-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+.mod-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.mod-items li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--muted2);
+  line-height: 1.4;
+}
+.mod-items li::before {
+  content: '→';
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-weight: 700;
+}
+.mod-orange  .mod-items li::before { color: var(--orange); }
+.mod-yellow  .mod-items li::before { color: var(--yellow); }
+.mod-blue    .mod-items li::before { color: var(--blue); }
+.mod-green   .mod-items li::before { color: var(--green); }
+.mod-red     .mod-items li::before { color: var(--red); }
+.mod-purple  .mod-items li::before { color: #a78bfa; }
+.mod-teal    .mod-items li::before { color: #2dd4bf; }
+
+.mod-gain {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mod-gain::before { content: '↑'; font-size: 14px; font-weight: 800; }
+.mod-orange .mod-gain  { color: var(--orange2); }
+.mod-yellow .mod-gain  { color: var(--yellow); }
+.mod-blue   .mod-gain  { color: var(--blue); }
+.mod-green  .mod-gain  { color: var(--green); }
+.mod-red    .mod-gain  { color: #ff8080; }
+.mod-purple .mod-gain  { color: #c4b5fd; }
+.mod-teal   .mod-gain  { color: #5eead4; }
+
+/* ───── CONNECTIONS ───── */
+.connections { background: var(--bg); }
+
+.conn-diagram {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.conn-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fadeUp 0.4s ease both;
+  transition: border-color 0.2s;
+}
+.conn-item:hover { border-color: var(--border2); }
+
+.conn-from-box, .conn-to-box {
+  padding: 18px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.conn-from-box { border-right: 1px solid var(--border); }
+
+.conn-box-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.conn-box-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--white);
+}
+.conn-arrow-wrap {
+  padding: 0 12px;
+  color: var(--orange);
+  font-size: 20px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.conn-action {
+  font-size: 11px;
+  color: var(--orange2);
+  font-weight: 600;
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+
+/* ───── CTA ───── */
+.cta-section {
+  padding: 80px 48px;
+  text-align: center;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 300px;
+  background: radial-gradient(ellipse, rgba(245,116,10,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -1.5px;
+  line-height: 1;
+  margin-bottom: 20px;
+  position: relative;
+}
+.cta-title span { color: var(--orange); }
+
+.cta-desc {
+  font-size: 16px;
+  color: var(--muted2);
+  max-width: 500px;
+  margin: 0 auto 36px;
+  line-height: 1.7;
+}
+
+.cta-pills {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+.cta-pill {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border2);
+  border-radius: 100px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted2);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.cta-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--orange);
+  color: var(--bg);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 16px 40px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+.cta-btn:hover { background: var(--orange2); transform: scale(1.02); }
+
+/* ───── ANIMATIONS ───── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* stagger modules */
+.modules-grid .mod-card:nth-child(1) { animation-delay: 0.04s; }
+.modules-grid .mod-card:nth-child(2) { animation-delay: 0.09s; }
+.modules-grid .mod-card:nth-child(3) { animation-delay: 0.14s; }
+.modules-grid .mod-card:nth-child(4) { animation-delay: 0.19s; }
+.modules-grid .mod-card:nth-child(5) { animation-delay: 0.24s; }
+.modules-grid .mod-card:nth-child(6) { animation-delay: 0.29s; }
+.modules-grid .mod-card:nth-child(7) { animation-delay: 0.34s; }
+
+/* stagger problems */
+.problems-grid .problem-card:nth-child(1) { animation-delay: 0.04s; }
+.problems-grid .problem-card:nth-child(2) { animation-delay: 0.09s; }
+.problems-grid .problem-card:nth-child(3) { animation-delay: 0.14s; }
+.problems-grid .problem-card:nth-child(4) { animation-delay: 0.19s; }
+
+/* ───── RESPONSIVE ───── */
+@media (max-width: 640px) {
+  .hero, .section-wrap, .cta-section { padding: 60px 20px; }
+  .hero-stats { gap: 28px; }
+  .stat-div { display: none; }
+  .flow-row { flex-direction: column; }
+  .flow-num { flex-direction: row; width: auto; }
+  .flow-num-line { width: auto; height: 2px; flex: 0; display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<section class="hero">
+  <div class="hero-tag">Solução para Metalúrgicas</div>
+  <h1 class="hero-title">
+    Pare de perder<br>
+    dinheiro por<br>
+    <em>desorganização</em>
+  </h1>
+  <p class="hero-sub">
+    Um sistema feito para a realidade da metalúrgica pequena e média. 
+    <strong>Controle total do pedido ao pagamento</strong> — sem planilha, sem papel, sem chute.
+  </p>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <span class="stat-num">7</span>
+      <span class="stat-label">Módulos integrados</span>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <span class="stat-num">0</span>
+      <span class="stat-label">Retrabalho manual</span>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Rastreabilidade</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PROBLEMAS ═══════════════════════ -->
+<section class="problems section-wrap">
+  <div class="section-eyebrow">O Diagnóstico</div>
+  <h2 class="section-title">Esses problemas<br>custam caro todo dia</h2>
+  <p class="section-desc">Não é falta de trabalho. É falta de ferramenta. Veja o que acontece quando não há sistema:</p>
+
+  <div class="problems-grid">
+    <div class="problem-card">
+      <span class="problem-icon">📋</span>
+      <div class="problem-title">Pedidos Perdidos ou Atrasados</div>
+      <p class="problem-desc">Pedidos anotados no caderno, no WhatsApp ou na cabeça do dono. Quando cresce o volume, algo sempre escapa — e o cliente vai embora.</p>
+      <span class="problem-signal">Impacto: perda de cliente</span>
+    </div>
+    <div class="problem-card">
+      <span class="problem-icon">🔩</span>
+      <div class="problem-title">Produção Sem Controle</div>
+      <p class="problem-desc">Ninguém sabe em que etapa está cada peça. O prazo passou, o responsável não sabia da prioridade, o cliente liga bravo.</p>
+      <span class="problem-signal">Impacto: atraso e retrabalho</span>
+    </div>
+    <div class="problem-card">
+      <span class="problem-icon">📦</span>
+      <div class="problem-title">Estoque no Escuro</div>
+      <p class="problem-desc">Material acaba no meio da produção. A compra emergencial sai mais cara. Ou então sobra material parado que vira custo invisível.</p>
+      <span class="problem-signal">Impacto: custo alto e parada</span>
+    </div>
+    <div class="problem-card">
+      <span class="problem-icon">💸</span>
+      <div class="problem-title">Financeiro na Intuição</div>
+      <p class="problem-desc">Faturamento, cobranças em aberto, contas a pagar — tudo espalhado. O dono não sabe se o mês foi bom ou ruim até o banco mostrar.</p>
+      <span class="problem-signal">Impacto: descapitalização</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FLUXO DA SOLUÇÃO ═══════════════════════ -->
+<section class="solution section-wrap">
+  <div class="section-eyebrow">Como Funciona</div>
+  <h2 class="section-title">Do primeiro contato<br>ao recebimento</h2>
+  <p class="section-desc">O sistema acompanha cada etapa automaticamente. Nada fica de fora, nada se perde.</p>
+
+  <div class="flow-track">
+
+    <div class="flow-row">
+      <div class="flow-num">
+        <div class="flow-num-inner">1</div>
+        <div class="flow-num-line"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-stage-label">Pré-venda</div>
+        <div class="flow-stage-title">Cliente entra em contato e solicita orçamento</div>
+        <p class="flow-stage-desc">O vendedor acessa o sistema, consulta o histórico do cliente (se já comprou antes), monta o orçamento com peças, prazo e valor — e envia direto pelo sistema.</p>
+        <div class="flow-features">
+          <span class="flow-feat">Cadastro de clientes</span>
+          <span class="flow-feat">Histórico completo</span>
+          <span class="flow-feat">Orçamento em minutos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-num">
+        <div class="flow-num-inner">2</div>
+        <div class="flow-num-line"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-stage-label">Venda</div>
+        <div class="flow-stage-title">Cliente aprova — pedido gerado automaticamente</div>
+        <p class="flow-stage-desc">Com um clique o orçamento vira pedido. Prazo de entrega é definido, status fica como "Aguardando Produção" e o sistema já avisa o chão de fábrica.</p>
+        <div class="flow-features">
+          <span class="flow-feat">Zero digitação dupla</span>
+          <span class="flow-feat">Status em tempo real</span>
+          <span class="flow-feat">Notificação automática</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-num">
+        <div class="flow-num-inner">3</div>
+        <div class="flow-num-line"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-stage-label">Planejamento</div>
+        <div class="flow-stage-title">Ordem de Produção criada com todas as etapas</div>
+        <p class="flow-stage-desc">O sistema monta a Ordem de Produção com as etapas específicas do produto (corte, dobra, solda, montagem, pintura). Cada etapa tem responsável e prazo definido.</p>
+        <div class="flow-features">
+          <span class="flow-feat">Etapas configuráveis</span>
+          <span class="flow-feat">Responsável por etapa</span>
+          <span class="flow-feat">Prazo por fase</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-num">
+        <div class="flow-num-inner">4</div>
+        <div class="flow-num-line"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-stage-label">Produção</div>
+        <div class="flow-stage-title">Chão de fábrica trabalha com rastreabilidade total</div>
+        <p class="flow-stage-desc">Cada operador registra o avanço da etapa. O sistema consome o estoque automaticamente conforme a produção avança. Atrasos geram alertas em tempo real para a gestão.</p>
+        <div class="flow-features">
+          <span class="flow-feat">Registro por etapa</span>
+          <span class="flow-feat">Consumo automático de estoque</span>
+          <span class="flow-feat">Alerta de atraso</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-num">
+        <div class="flow-num-inner">5</div>
+        <div class="flow-num-line"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-stage-label">Entrega</div>
+        <div class="flow-stage-title">Produto finalizado — expedição e nota fiscal</div>
+        <p class="flow-stage-desc">Quando a última etapa é concluída, o pedido vai para "Pronto para Expedição". A saída é registrada no estoque de produto acabado e o cliente é notificado.</p>
+        <div class="flow-features">
+          <span class="flow-feat">Baixa automática no estoque</span>
+          <span class="flow-feat">Confirmação de entrega</span>
+          <span class="flow-feat">Notificação ao cliente</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-num">
+        <div class="flow-num-inner">6</div>
+        <div class="flow-num-line"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-stage-label">Pós-venda</div>
+        <div class="flow-stage-title">Cobrança gerada automaticamente no financeiro</div>
+        <p class="flow-stage-desc">No momento da entrega, o financeiro já recebe o lançamento de "contas a receber". O dono acompanha pagamentos em aberto, vencimentos e fluxo de caixa em um painel único.</p>
+        <div class="flow-features">
+          <span class="flow-feat">Contas a receber automático</span>
+          <span class="flow-feat">Alerta de vencimento</span>
+          <span class="flow-feat">Fluxo de caixa atualizado</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-num">
+        <div class="flow-num-inner">★</div>
+      </div>
+      <div class="flow-content" style="border-color: rgba(245,116,10,0.35); background: rgba(245,116,10,0.05);">
+        <div class="flow-stage-label">Gestão</div>
+        <div class="flow-stage-title">Dashboard — o dono enxerga tudo de um lugar só</div>
+        <p class="flow-stage-desc">Quantos pedidos em aberto, qual a produção atrasada, quanto vai entrar essa semana, qual o estoque crítico. Tudo em uma tela, em tempo real, sem pedir relatório para ninguém.</p>
+        <div class="flow-features">
+          <span class="flow-feat">Indicadores ao vivo</span>
+          <span class="flow-feat">Alerta de pendências</span>
+          <span class="flow-feat">Relatório de faturamento</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════ MÓDULOS ═══════════════════════ -->
+<section class="modules section-wrap">
+  <div class="section-eyebrow">Os Módulos</div>
+  <h2 class="section-title">7 ferramentas.<br>Um sistema só.</h2>
+  <p class="section-desc">Tudo integrado. O que acontece em um módulo alimenta os outros automaticamente.</p>
+
+  <div class="modules-grid">
+
+    <div class="mod-card mod-orange">
+      <div class="mod-header">
+        <span class="mod-icon">📋</span>
+        <span class="mod-num">01</span>
+      </div>
+      <div class="mod-title">Comercial</div>
+      <div class="mod-sub">Clientes & Orçamentos</div>
+      <ul class="mod-items">
+        <li>Cadastro completo de clientes com histórico de compras</li>
+        <li>Criação rápida de orçamentos com tabela de preços</li>
+        <li>Acompanhamento de propostas abertas (follow-up)</li>
+        <li>Conversão de orçamento em pedido com 1 clique</li>
+      </ul>
+      <div class="mod-gain">Mais vendas, menos proposta perdida</div>
+    </div>
+
+    <div class="mod-card mod-yellow">
+      <div class="mod-header">
+        <span class="mod-icon">🛒</span>
+        <span class="mod-num">02</span>
+      </div>
+      <div class="mod-title">Pedidos</div>
+      <div class="mod-sub">Gestão & Status</div>
+      <ul class="mod-items">
+        <li>Visão geral de todos os pedidos em andamento</li>
+        <li>Status por pedido: orçamento, aprovado, em produção, entregue</li>
+        <li>Prazo de entrega com alerta de atraso automático</li>
+        <li>Histórico completo por cliente</li>
+      </ul>
+      <div class="mod-gain">Nenhum pedido esquecido ou atrasado</div>
+    </div>
+
+    <div class="mod-card mod-blue">
+      <div class="mod-header">
+        <span class="mod-icon">🔧</span>
+        <span class="mod-num">03</span>
+      </div>
+      <div class="mod-title">Ordem de Produção</div>
+      <div class="mod-sub">OP & Planejamento</div>
+      <ul class="mod-items">
+        <li>Criação automática a partir do pedido aprovado</li>
+        <li>Etapas de produção configuráveis por tipo de produto</li>
+        <li>Responsável e prazo definido por etapa</li>
+        <li>Prioridade de produção gerenciável pelo gestor</li>
+      </ul>
+      <div class="mod-gain">Produção organizada e previsível</div>
+    </div>
+
+    <div class="mod-card mod-purple">
+      <div class="mod-header">
+        <span class="mod-icon">🏭</span>
+        <span class="mod-num">04</span>
+      </div>
+      <div class="mod-title">Controle de Produção</div>
+      <div class="mod-sub">Chão de Fábrica</div>
+      <ul class="mod-items">
+        <li>Operadores registram avanço por etapa (corte, solda, montagem...)</li>
+        <li>Rastreabilidade: quem fez, quando, quanto tempo</li>
+        <li>Alerta automático para gestor se atrasar</li>
+        <li>Painel de produção em tempo real</li>
+      </ul>
+      <div class="mod-gain">Visibilidade total sem precisar ir até a fábrica</div>
+    </div>
+
+    <div class="mod-card mod-green">
+      <div class="mod-header">
+        <span class="mod-icon">📦</span>
+        <span class="mod-num">05</span>
+      </div>
+      <div class="mod-title">Estoque</div>
+      <div class="mod-sub">Matéria-prima & Materiais</div>
+      <ul class="mod-items">
+        <li>Entrada e saída de materiais com rastreio</li>
+        <li>Consumo automático conforme a produção avança</li>
+        <li>Alerta de estoque mínimo antes de acabar</li>
+        <li>Relatório de consumo por produto fabricado</li>
+      </ul>
+      <div class="mod-gain">Sem parada de produção por falta de material</div>
+    </div>
+
+    <div class="mod-card mod-red">
+      <div class="mod-header">
+        <span class="mod-icon">💰</span>
+        <span class="mod-num">06</span>
+      </div>
+      <div class="mod-title">Financeiro</div>
+      <div class="mod-sub">Contas & Fluxo de Caixa</div>
+      <ul class="mod-items">
+        <li>Contas a receber geradas automaticamente na entrega</li>
+        <li>Controle de contas a pagar (fornecedores, despesas)</li>
+        <li>Fluxo de caixa projetado e real</li>
+        <li>Relatório de faturamento por período e por cliente</li>
+      </ul>
+      <div class="mod-gain">Saber se o negócio é lucrativo de verdade</div>
+    </div>
+
+    <div class="mod-card mod-teal">
+      <div class="mod-header">
+        <span class="mod-icon">📊</span>
+        <span class="mod-num">07</span>
+      </div>
+      <div class="mod-title">Dashboard</div>
+      <div class="mod-sub">Visão do Dono</div>
+      <ul class="mod-items">
+        <li>Quantos pedidos abertos, em produção, atrasados</li>
+        <li>Faturamento do mês vs mês anterior</li>
+        <li>Estoque em nível crítico</li>
+        <li>Cobranças em atraso com valor total em aberto</li>
+      </ul>
+      <div class="mod-gain">Decisão baseada em dado, não em intuição</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════ CONEXÕES ═══════════════════════ -->
+<section class="connections section-wrap">
+  <div class="section-eyebrow">Integração</div>
+  <h2 class="section-title">Tudo conectado.<br>Nada digitado duas vezes.</h2>
+  <p class="section-desc">As informações fluem automaticamente entre os módulos. O vendedor não precisa avisar a produção. A produção não precisa avisar o financeiro.</p>
+
+  <div class="conn-diagram">
+
+    <div class="conn-item">
+      <div class="conn-from-box">
+        <span class="conn-box-label">Origem</span>
+        <span class="conn-box-name">Orçamento</span>
+      </div>
+      <div class="conn-arrow-wrap">→</div>
+      <div class="conn-to-box">
+        <span class="conn-box-label">Gera</span>
+        <span class="conn-box-name">Pedido</span>
+        <span class="conn-action">Aprovação com 1 clique</span>
+      </div>
+    </div>
+
+    <div class="conn-item">
+      <div class="conn-from-box">
+        <span class="conn-box-label">Origem</span>
+        <span class="conn-box-name">Pedido</span>
+      </div>
+      <div class="conn-arrow-wrap">→</div>
+      <div class="conn-to-box">
+        <span class="conn-box-label">Gera</span>
+        <span class="conn-box-name">Ordem de Produção</span>
+        <span class="conn-action">Automático, sem redigitar</span>
+      </div>
+    </div>
+
+    <div class="conn-item">
+      <div class="conn-from-box">
+        <span class="conn-box-label">Origem</span>
+        <span class="conn-box-name">Produção</span>
+      </div>
+      <div class="conn-arrow-wrap">→</div>
+      <div class="conn-to-box">
+        <span class="conn-box-label">Consome</span>
+        <span class="conn-box-name">Estoque</span>
+        <span class="conn-action">Baixa automática por etapa</span>
+      </div>
+    </div>
+
+    <div class="conn-item">
+      <div class="conn-from-box">
+        <span class="conn-box-label">Origem</span>
+        <span class="conn-box-name">Entrega</span>
+      </div>
+      <div class="conn-arrow-wrap">→</div>
+      <div class="conn-to-box">
+        <span class="conn-box-label">Alimenta</span>
+        <span class="conn-box-name">Financeiro</span>
+        <span class="conn-action">Cobrança gerada na entrega</span>
+      </div>
+    </div>
+
+    <div class="conn-item">
+      <div class="conn-from-box">
+        <span class="conn-box-label">Origem</span>
+        <span class="conn-box-name">Todos Módulos</span>
+      </div>
+      <div class="conn-arrow-wrap">→</div>
+      <div class="conn-to-box">
+        <span class="conn-box-label">Alimentam</span>
+        <span class="conn-box-name">Dashboard</span>
+        <span class="conn-action">Visão em tempo real</span>
+      </div>
+    </div>
+
+    <div class="conn-item">
+      <div class="conn-from-box">
+        <span class="conn-box-label">Origem</span>
+        <span class="conn-box-name">Estoque Baixo</span>
+      </div>
+      <div class="conn-arrow-wrap">→</div>
+      <div class="conn-to-box">
+        <span class="conn-box-label">Dispara</span>
+        <span class="conn-box-name">Alerta de Compra</span>
+        <span class="conn-action">Antes de acabar o material</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════ CTA ═══════════════════════ -->
+<section class="cta-section">
+  <h2 class="cta-title">Pronto para<br><span>organizar sua fábrica?</span></h2>
+  <p class="cta-desc">Implantação simples, sem precisar de TI. Sua equipe aprende em menos de uma semana.</p>
+  <div class="cta-pills">
+    <span class="cta-pill"><span class="dot"></span> Sem papel ou planilha</span>
+    <span class="cta-pill"><span class="dot"></span> Acesso pelo celular ou computador</span>
+    <span class="cta-pill"><span class="dot"></span> Suporte em português</span>
+    <span class="cta-pill"><span class="dot"></span> Dados 100% seus</span>
+  </div>
+  <a href="#" class="cta-btn">Agendar uma demonstração →</a>
+</section>
+
+</body>
+</html>
